@@ -11,16 +11,20 @@
 #include <stdlib.h>
 
 #include <time.h>
-//Define para matriz
-#define LINHA 10
-#define COLUNA 10
+#include <math.h>
+//define para matriz
+#define LINHA 3
+#define COLUNA 3
+//define para macrobloco
+#define MBLINHA 2
+#define MBCOLUNA 2
 
 //matriz de dois ponteiros, uma para linha e outro para coluna, REF página 114 do livro 1 de C Giraldelli
 int **matriz;
 //variável global
 int qtdPrimos = 0;
 
-void* ehPrimo(int numero);
+int ehPrimo(int numero);
 
 int main(int argc, char* argv[]) {
     srand(time(NULL));
@@ -42,8 +46,8 @@ int main(int argc, char* argv[]) {
     for (int l = 0; l < LINHA; l++) {
         for (int c = 0; c < COLUNA; c++) {
             printf("%d ", matriz[l][c]);
-            ehPrimo(matriz[l][c]);
-        };
+            if (ehPrimo(matriz[l][c])) qtdPrimos++;
+        }
         printf("\n");
     }
 
@@ -59,10 +63,13 @@ int main(int argc, char* argv[]) {
 }
 
 //Funções
-void* ehPrimo(int numero) {
-    int contador = 0;
-    //Se o resto da divisão for zero, o i é um divisor, assim o contador é incrementado
-    for (int i = 1; i <= numero; i++) if (numero % i == 0) contador++;
+int ehPrimo(int numero) {
+    if (numero == 1) return 0;
+    int raiz = sqrt(numero);
+    //Se o resto da divisão for zero, o i é um divisor
+    for (int i = 2; i <= raiz; i++) {
+        if (numero % i == 0) return 0;
+    }
 
-    if (contador == 2) qtdPrimos++;
+    return 1;
 }
