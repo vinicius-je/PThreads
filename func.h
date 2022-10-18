@@ -4,7 +4,7 @@
 #include "main.h"
 #include "func.h"
 
-int		ehPrimo(int numero);
+int	ehPrimo(int numero);
 void	gerarMatriz();
 
 #endif  
