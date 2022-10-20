@@ -25,22 +25,10 @@ int **matriz;
 int qtdPrimos = 0;
 
 int ehPrimo(int numero);
+void* gerarMatriz();
 
 int main(int argc, char* argv[]) {
-    srand(time(NULL));
-    //Aloca espaço de memória para as linhas
-    matriz = calloc(LINHA, sizeof(int*));
-
-    //Aloca espaço de memória para as coluas de cada linha
-    for (int i = 0; i < COLUNA; i++)
-        matriz[i] = calloc(COLUNA, sizeof(int));
-   
-
-    //Loop para adicionar os valores aleatórios na matriz
-    for (int l = 0; l < LINHA; l++) {
-        for (int c = 0; c < COLUNA; c++)
-            matriz[l][c] = rand() % 31999;
-    }
+    gerarMatriz();
 
     //Loop para imprimir a matriz
     for (int l = 0; l < LINHA; l++) {
@@ -72,4 +60,29 @@ int ehPrimo(int numero) {
     }
 
     return 1;
+}
+
+void* gerarMatriz() {
+    srand(2000);
+    //Aloca espaço de memória para as linhas
+    matriz = calloc(LINHA, sizeof(int*));
+
+    //Aloca espaço de memória para as coluas de cada linha
+    for (int i = 0; i < COLUNA; i++)
+        matriz[i] = calloc(COLUNA, sizeof(int));
+
+
+    //Loop para adicionar os valores aleatórios na matriz
+    for (int l = 0; l < LINHA; l++) {
+        for (int c = 0; c < COLUNA; c++)
+            matriz[l][c] = rand() % 31999;
+    }
+
+    /* 
+    //Libera as linhas da matriz
+    for (int i = 0; i < LINHA; i++)
+        free(matriz[i]);
+    //Libera a matriz de ponteiro
+    free(matriz);
+    */
 }
