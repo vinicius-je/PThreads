@@ -8,20 +8,22 @@
 */
 
 /* Declaração das bibliotecas internas*/
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+#include <unistd.h>
+
 #pragma comment(lib,"pthreadVC2.lib")
 #define HAVE_STRUCT_TIMESPEC
-
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS 1
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 1
 #pragma comment(lib,"pthreadVC2.lib")
 #define HAVE_STRUCT_TIMESPEC
 
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
+#define NUM_THREADS 5
 
 /* Declaração das bibliotecas externas*/
 #include "main.h"
