@@ -28,22 +28,75 @@
 //  matriz de dois ponteiros, uma para linha e outro para coluna, REF página 114 do livro 1 de C Giraldelli
 int **matriz;
 
+pthread_t           tid[2];
+int                 counter;
+pthread_mutex_t     lock;
+
 void gerarMatriz();
 void gerarMacrobloco();
 
 int main()
+{
+    gerarMatriz();
+    printf("\n\n");
+    gerarMacrobloco();
+    phtreadsfunc();
+    //gerarMatriz();
+    return 0;
+}
+
+void phtreadsfunc()
 {
     pthread_t   threads[NUM_THREADS];
     int         thread_args[NUM_THREADS];
     int         i;
     int         result_code;
     
-    gerarMatriz();
-    printf("\n\n");
-    gerarMacrobloco();
-    //gerarMatriz();
-    return 0;
+    /// nao testado
+    
+    for (i = 0; i < NUM_THREADS; i++)                   /*cria todas as threads um por um */
+    {
+        printf("no phtreadsfunction: criando thread %d.\n", i);
+        thread_args[i] = i;
+        result_code = pthread_create(&threads[i], NULL, pthreadsfindprime, &thread_args[i]);
+        assert(!result_code);
+    }
+    
+    pthread_join(tid[0], NULL);
+    pthread_join(tid[1], NULL);
+    pthread_mutex_destroy(&lock);
 }
+
+void* pthreadsfindprime(void *arguments)
+{
+    int index           = *((int *)arguments);
+    int sleep_time      = 1 + rand() % NUM_THREADS;
+  
+    ///// nao testado
+    
+    printf("THREAD %d: Iniciou.\n", index);
+    printf("THREAD %d: vai dormir por %d segundos.\n", index, sleep_time);
+    
+    pthread_mutex_lock(&lock);
+
+    unsigned long i = 0;
+    counter += 1;
+    printf("\n Job %d iniciou\n", counter);
+
+    for(i=0; i<(0xFFFFFFFF);i++)
+    {
+        
+    }
+
+
+    pthread_mutex_unlock(&lock);
+    sleep(sleep_time);
+    //////
+    
+    printf("THREAD %d: Terminou.\n", index);
+    return NULL;
+}
+
 
 void gerarMatriz(){
     srand(2000);
