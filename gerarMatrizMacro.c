@@ -1,6 +1,22 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
+#include <time.h>
+#include <unistd.h>
+
+#pragma comment(lib,"pthreadVC2.lib")
+#define HAVE_STRUCT_TIMESPEC
+#pragma once
+#define _CRT_SECURE_NO_WARNINGS 1
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 1
+#pragma comment(lib,"pthreadVC2.lib")
+#define HAVE_STRUCT_TIMESPEC
+
+//  QNT DE THREADS
+#define NUM_THREADS 4
+
 //  MATRIZ
 #define LINHA 9
 #define COLUNA 9
@@ -8,13 +24,20 @@
 // MACROBLOCO
 #define MB_LINHA 3
 #define MB_COLUNA 3
+
 //  matriz de dois ponteiros, uma para linha e outro para coluna, REF página 114 do livro 1 de C Giraldelli
 int **matriz;
 
 void gerarMatriz();
 void gerarMacrobloco();
 
-int main(){
+int main()
+{
+    pthread_t   threads[NUM_THREADS];
+    int         thread_args[NUM_THREADS];
+    int         i;
+    int         result_code;
+    
     gerarMatriz();
     printf("\n\n");
     gerarMacrobloco();
