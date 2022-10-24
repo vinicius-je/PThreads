@@ -12,7 +12,7 @@
 #include  <stdlib.h>
 #include  <time.h>
 #include  <math.h>
-#include  <assert.h>
+//#include  <assert.h>
 
 #define              NUM_THREADS    4
 #define              M_LINHA        10
@@ -32,34 +32,34 @@ int                  qtprimo;
 
 typedef struct
 {
-  int linhaInicial;
-  int colunaInicial;
-  int linhaFim;
-  int colunaFim;
+    int    linhaInicial;
+    int    colunaInicial;
+    int    linhaFim;
+    int    colunaFim;
 }
 IndexMacrobloco;
 
 typedef struct
 {
-  int fromidx;
-  int length;
+    int  fromidx;
+    int  length;
 }
 thread_arg, *ptr_thread_arg;
 
-pthread_t    threads    [NUM_THREADS];
-thread_arg   arguments  [NUM_THREADS];
+pthread_t          threads    [NUM_THREADS];
+thread_arg         arguments  [NUM_THREADS];
 
-IndexMacrobloco *vetIndexMacro;
+IndexMacrobloco    *vetIndexMacro;
 
-int vef_primo(int numero);
-void ext_threads();
-void gerarMatriz();
-void gerarMacrobloco();
-void printIndexMacroElemento();
-void printMacroblocos();
-void *bus_primo(void *param);
+int    vef_primo                (int numero);
+void   ext_threads              ();
+void   gerarMatriz              ();
+void   gerarMacrobloco          ();
+void   printIndexMacroElemento  ();
+void   printMacroblocos         ();
+void   *bus_primo               (void *param);
 
-int main(int argc, char *argv[], char *envp[])
+int main (int argc, char *argv[], char *envp[])
 {
     qtprimo = 0;
     gerarMatriz();
@@ -67,7 +67,7 @@ int main(int argc, char *argv[], char *envp[])
     gerarMacrobloco();
     //printMacroblocos();
     ext_threads();
-
+    printf("\n qnt primos: %d\n", qtprimo);
     return 0;
 }
 
@@ -180,7 +180,7 @@ void ext_threads()
     //printf("\n no ext_threads: criando thread %d.\n", i);
     thread_args[i] = i;
     result_code = pthread_create(&threads[i], NULL, bus_primo, &thread_args[i]);
-    assert(!result_code);
+    //assert(!result_code);
   }
 
   //printf("\n no ext_threads: todas as threads foram criadas.\n");
@@ -189,19 +189,13 @@ void ext_threads()
   for (i = 0; i < NUM_THREADS; i++)
   {
     result_code = pthread_join(threads[i], NULL);
-    assert(!result_code);
+    //assert(!result_code);
     //printf("\n no ext_threads: a thread %d terminou.\n", i);
   }
   
   //printf("\n ext_threads terminou.\n");
-  printf("\n qnt primos: %d\n", qtprimo);
   return 0;
 }
-
-
-
-
-
 
 void *bus_primo(void *arguments)
 {
@@ -219,13 +213,22 @@ void *bus_primo(void *arguments)
   
   //printf("\n### a thread %d Iniciou.\n", index);
 
-  for (int id_t_mb = index; (id_t_mb + NUM_THREADS) <= qtdMacrobloco+3; id_t_mb += NUM_THREADS)
+  //printf("\nfuncao %d",index);
+  for (
+        int id_t_mb = index;
+        (id_t_mb + NUM_THREADS) <= qtdMacrobloco + (NUM_THREADS - 1);
+        id_t_mb += NUM_THREADS
+      )
   {
     
-    if ((id_t_mb + NUM_THREADS) <= qtdMacrobloco+3)
+    if (
+         (id_t_mb + NUM_THREADS) <= qtdMacrobloco + (NUM_THREADS - 1)
+       )
     {
-      //printf("\nfuncao %d",id_t_mb+1);
+      //printf("\nfuncao %d",id_t_mb);
+      
       pthread_mutex_init(&mutex, NULL);
+      pthread_mutex_lock(&mutex);
       
       linhaInit   = vetIndexMacro[id_t_mb].linhaInicial;
       colunaInit  = vetIndexMacro[id_t_mb].colunaInicial;
@@ -236,14 +239,16 @@ void *bus_primo(void *arguments)
       {
         for (int coluna = colunaInit; coluna <= colunaFim ; coluna++)
         {
-          //printf("%d ", matriz[linha][coluna]);
-        
-          pthread_mutex_lock(&mutex);
-          vef_primo(matriz[linha][coluna]);
+          //printf("%d ", matriz[linha][coluna]);  
+          if (vef_primo(matriz[linha][coluna]) == 1)
+          {
+            qtprimo++;
+          }
           pthread_mutex_unlock(&mutex);
           //printf("\n$$$ a thread %d: vai descansar por %d segundos.\n", index, sleep_time);
         }
-      } //printf("\n!!! a thread %d Terminou.\n", index);
+      }
+      //printf("\n!!! a thread %d Terminou.\n", index);
     }
   }
   return NULL;
@@ -265,12 +270,12 @@ int vef_primo(int nmb)
     }
     if (cont == 2)
     {
-        qtprimo++;
-      printf("\nP\t %d \test\t\t\tprimo", nmb);
+        //qtprimo++;
+      //printf("\nP\t %d \test\t\t\tprimo", nmb);
     }
     else
     {
-      printf("\nN\t %d \tnon est\t\tprimo", nmb);
+      //printf("\nN\t %d \tnon est\t\tprimo", nmb);
     }
-  return (cont == 2) ? 1 : 0;
+    return (cont == 2) ? 1 : 0;
 }
