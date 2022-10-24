@@ -51,7 +51,7 @@ thread_arg   arguments  [NUM_THREADS];
 
 IndexMacrobloco *vetIndexMacro;
 
-void vef_primo(int numero);
+int vef_primo(int numero);
 void ext_threads();
 void gerarMatriz();
 void gerarMacrobloco();
@@ -250,7 +250,7 @@ void *bus_primo(void *arguments)
   pthread_exit(0);
 }
 
-void vef_primo(int nmb)
+int vef_primo(int nmb)
 {
     int i;
     int cont;
@@ -266,11 +266,11 @@ void vef_primo(int nmb)
     if (cont == 2)
     {
         qtprimo++;
-      printf("\nP\t %d \test primo", nmb);
+      printf("\nP\t %d \test\t\t\tprimo", nmb);
     }
     else
     {
-      printf("\nN\t %d \tnon est primo", nmb);
+      printf("\nN\t %d \tnon est\t\tprimo", nmb);
     }
-  //return (cont == 2) ? 1 : 0;
+  return (cont == 2) ? 1 : 0;
 }
