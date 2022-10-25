@@ -17,15 +17,16 @@
 #define     NUM_THREADS     4
 #define     M_LINHA         10000
 #define     M_COLUNA        10000
-#define     MB_LINHA        500
-#define     MB_COLUNA       500
+#define     MB_LINHA        2
+#define     MB_COLUNA       2
+#define     ld_mutex        0
 
 pthread_mutex_t mutex; /* declaração da variável mutex */
 
 int     qtdMacrobloco = (M_LINHA * M_COLUNA) / (MB_LINHA * MB_COLUNA);
 int     counter;
 int     macroAtual = 0;
-int**   matriz;
+int** matriz;
 int     qtprimo;
 double  tempo;
 
@@ -40,29 +41,31 @@ typedef struct
 }
 IndexMacrobloco;
 
+/*
 typedef struct
 {
     int     fromidx;
     int     length;
 }
 thread_arg, *ptr_thread_arg;
-
-pthread_t threads[NUM_THREADS];
-thread_arg arguments[NUM_THREADS];
+*/
+//pthread_t *tid;
+//pthread_t threads[NUM_THREADS];
+//thread_arg arguments[NUM_THREADS];
 
 IndexMacrobloco* vetIndexMacro;
 
 int     ehPrimo(int n);
 void    serial();
-void    ext_threads();
+int     ext_threads();
 void    gerarMatriz();
 void    gerarMacrobloco();
 void    printIndexMacroElemento();
 void    printMacroblocos();
-void*   bus_primo(void* param);
+void* bus_primo(void* param);
 void    liberarMemoria();
 
-int main(int argc, char **argv, char **envp)
+int main(int argc, char** argv, char** envp)
 {
     qtprimo = 0;
     clock_t inicio;
@@ -75,15 +78,17 @@ int main(int argc, char **argv, char **envp)
     serial();
     fim = clock();
     tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-    printf("Tempo de execucao serial: %f segundos\n", tempo);
-
+    printf("Tempo de execucao serial:\t\t %f segundos\n", tempo);
+    qtprimo = 0;
     inicio = clock();
     ext_threads();
     fim = clock();
     tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
 
-    printf("Tempo de execucao multithread: %f segundos\n", tempo);
-    printf("qnt primos: %d\n", qtprimo);
+    printf("Tempo de execucao multithread:\t\t %f segundos\n", tempo);
+    printf("qnt numeros:\t\t %d\n", (M_LINHA * M_COLUNA));
+    printf("qnt primos:\t\t %d\n", qtprimo);
+    printf("qnt nao primos:\t\t %d\n", ((M_LINHA * M_COLUNA) - qtprimo));
 
     liberarMemoria();
     return 0;
@@ -111,11 +116,16 @@ void gerarMatriz()
         }
     }
     //  Loop para imprimir a matriz
-    /*for (int l = 0; l < M_LINHA; l++) {
-      for (int c = 0; c < M_COLUNA; c++)
-        printf("\t%d ", matriz[l][c]);
-      printf("\n");
-    }*/
+    /*
+    for (int l = 0; l < M_LINHA; l++)
+    {
+        for (int c = 0; c < M_COLUNA; c++)
+        {
+            printf("\t%d ", matriz[l][c]);
+        }
+        //printf("\n");
+    }
+    */
 }
 
 void gerarMacrobloco()
@@ -188,19 +198,25 @@ void serial()
     }
 }
 
-void ext_threads()
+int ext_threads()
 {
-    pthread_t   threads         [NUM_THREADS];
-    int         thread_args     [NUM_THREADS];
+    pthread_t   threads[NUM_THREADS];
+    int         thread_args[NUM_THREADS];
     int         i;
     int         result_code;
 
+    if (pthread_mutex_init(&mutex, NULL) != 0)
+    {
+        //printf("\n mutex init nao funcionou\n");
+        return 1;
+    }
+
     for (i = 0; i < NUM_THREADS; i++)
     {
-        // printf("\n no ext_threads: criando thread %d.\n", i);
+        //printf("\n no ext_threads: criando thread %d.\n", i);
         thread_args[i] = i;
         result_code = pthread_create(&threads[i], NULL, bus_primo, &thread_args[i]);
-        // assert(!result_code);
+         //assert(!result_code);
     }
 
     // printf("\n no ext_threads: todas as threads foram criadas.\n");
@@ -209,11 +225,13 @@ void ext_threads()
     for (i = 0; i < NUM_THREADS; i++)
     {
         result_code = pthread_join(threads[i], NULL);
-        // assert(!result_code);
+
+        //assert(!result_code);
         // printf("\n no ext_threads: a thread %d terminou.\n", i);
     }
-
+    pthread_mutex_destroy(&mutex);
     // printf("\n ext_threads terminou.\n");
+    return 0;
 }
 
 void* bus_primo(void* arguments)
@@ -223,85 +241,49 @@ void* bus_primo(void* arguments)
     int colunaInit;
     int linhaFim;
     int colunaFim;
-    int index;
+    int index = *((int*)arguments);
     int id_t_mb;
-    
-    index = *((int*)arguments);
-    // int    sleep_time  =  1 + rand() % NUM_THREADS;
 
-    // int        id_t_mb = index;
-    // NUM_THREADS
-    // qtdMacrobloco
+    //int    sleep_time  =  1 + rand() % NUM_THREADS;
 
     // printf("\n### a thread %d Iniciou.\n", index);
     // printf("\nfuncao %d",index);
 
-    for (
-        int id_t_mb = index;
-        (id_t_mb + NUM_THREADS) <= qtdMacrobloco + (NUM_THREADS - 1);
-        id_t_mb += NUM_THREADS
-        )
+    for ( int id_t_mb = index; (id_t_mb + NUM_THREADS) < (qtdMacrobloco + (NUM_THREADS - 1)); id_t_mb += NUM_THREADS)
     {
+        linhaInit = vetIndexMacro[id_t_mb].linhaInicial;
+        colunaInit = vetIndexMacro[id_t_mb].colunaInicial;
+        linhaFim = vetIndexMacro[id_t_mb].linhaFim;
+        colunaFim = vetIndexMacro[id_t_mb].colunaFim;
 
-        if ((id_t_mb + NUM_THREADS) <= qtdMacrobloco + (NUM_THREADS - 1))
+        for (int linha = linhaInit; linha <= linhaFim; linha++)
         {
-            // printf("\nfuncao %d",id_t_mb)
-
-            linhaInit = vetIndexMacro[id_t_mb].linhaInicial;
-            colunaInit = vetIndexMacro[id_t_mb].colunaInicial;
-            linhaFim = vetIndexMacro[id_t_mb].linhaFim;
-            colunaFim = vetIndexMacro[id_t_mb].colunaFim;
-            
-            pthread_mutex_init(&mutex, NULL);
-            pthread_mutex_lock(&mutex);
-            
-            for (int linha = linhaInit; linha <= linhaFim; linha++)
+            for (int coluna = colunaInit; coluna <= colunaFim; coluna++)
             {
-                for (int coluna = colunaInit; coluna <= colunaFim; coluna++)
+                if (ehPrimo(matriz[linha][coluna]) == 1)
                 {
-                    // printf("%d ", matriz[linha][coluna]);
-                    
-                    if (ehPrimo(matriz[linha][coluna]) == 1)
+                    if (ld_mutex == 1)
                     {
-                        qtprimo++;
+                        pthread_mutex_lock(&mutex);
                     }
-                    
-                    pthread_mutex_unlock(&mutex);
-                    // printf("\n$$$ a thread %d: vai descansar por %d segundos.\n",
-                    // index, sleep_time);
+                    qtprimo++;
+                    if (ld_mutex == 1)
+                    {
+                        pthread_mutex_unlock(&mutex);
+                    }
                 }
+                // printf("\n$$$ a thread %d: vai descansar por %d segundos.\n",
+                // index, sleep_time);
             }
-            // printf("\n!!! a thread %d Terminou.\n", index);
         }
+        // printf("\n!!! a thread %d Terminou.\n", index);
     }
     return NULL;
-    pthread_exit(0);
+    //pthread_exit(0);
 }
 
 int ehPrimo(int n)
 {
-    /*
-    int i;
-    int cont;
-    cont = 0;
-
-    for (int i = 1; i <= n;
-        i++) // Se o resto da divisão for zero, o i é um divisor,
-    {         // assim o contador é incrementado
-        if (n % i == 0) {
-            cont++;
-        }
-    }
-    if (cont == 2) {
-        // qtprimo++;
-        // printf("\nP\t %d \test\t\t\tprimo", n);
-    }
-    else {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-    }
-    return (cont == 2) ? 1 : 0;
-    */
-
     if (n == 1)
     {
         // printf("\nN\t %d \tnon est\t\tprimo", n);
