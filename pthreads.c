@@ -28,8 +28,7 @@ int                  macroAtual = 0;
 int                  **matriz;
 int                  qtprimo;
 
-// STRUCT PARA CONTROLAR OS MACROBLOCOS [sessão critica]
-
+//  struct para armazenar o index de cada macrobloco [sessão critica]
 typedef struct
 {
     int    linhaInicial;
@@ -108,7 +107,7 @@ void gerarMacrobloco()
     //  Index do proximo macrobloco
     int proxMacroLinha = 0;
     int proxMacroColuna = 0;
-    // Aloca espaço de memória para o vetor de struct
+    //  Aloca espaço de memória para o vetor de struct que armazena o index de cada macrobloco
     vetIndexMacro = calloc(qtdMacrobloco, sizeof(IndexMacrobloco));
     
     int indexVet = 0;
@@ -116,7 +115,7 @@ void gerarMacrobloco()
     {
         for(int j = 0; j < macroblocoPorColuna; j++)
         {
-            // Armazena cada index no vetor de struct
+            //  Armazena cada index no vetor de struct
             vetIndexMacro[indexVet].linhaInicial = proxMacroLinha;
             vetIndexMacro[indexVet].colunaInicial = proxMacroColuna;
             vetIndexMacro[indexVet].linhaFim = proxMacroLinha + MB_LINHA - 1;
@@ -124,13 +123,6 @@ void gerarMacrobloco()
             indexVet++;
 
             proxMacroColuna += MB_COLUNA;
-
-            /* REMOVER AO FINAL DO TRABALHO [SERVER PARA IMPRIMIR O INDEX DE CADA MACROBLOCO]
-            printf("\nprimeiro: %d", matriz[proxMacroLinha][proxMacroColuna]);
-            printf("\nultimo: %d", matriz[proxMacroLinha + MB_LINHA - 1][proxMacroColuna + MB_COLUNA - 1]);
-            printf("\n");
-            */
-
         }
         proxMacroLinha += MB_LINHA;
         proxMacroColuna = 0;
@@ -164,10 +156,6 @@ void printMacroblocos()
     }
 }
 
-
-
-
-
 void ext_threads()
 {
   pthread_t  threads      [NUM_THREADS];
@@ -185,12 +173,12 @@ void ext_threads()
 
   //printf("\n no ext_threads: todas as threads foram criadas.\n");
 
-  //aguardar cada thread terminar
+  //  Aguardar cada thread terminar
   for (i = 0; i < NUM_THREADS; i++)
   {
     result_code = pthread_join(threads[i], NULL);
-    //assert(!result_code);
-    //printf("\n no ext_threads: a thread %d terminou.\n", i);
+    //  assert(!result_code);
+    //  printf("\n no ext_threads: a thread %d terminou.\n", i);
   }
   
   //printf("\n ext_threads terminou.\n");
