@@ -1,4 +1,3 @@
-
 #pragma     comment(lib, "pthreadVC2.lib")
 #define     HAVE_STRUCT_TIMESPEC
 #pragma     once
@@ -12,13 +11,12 @@
 #include    <stdio.h>
 #include    <stdlib.h>
 #include    <time.h>
-//#include  <assert.h>
 
 #define     NUM_THREADS     4
-#define     M_LINHA         10000
-#define     M_COLUNA        10000
-#define     MB_LINHA        2
-#define     MB_COLUNA       2
+#define     M_LINHA         22000
+#define     M_COLUNA        22000
+#define     MB_LINHA        220
+#define     MB_COLUNA       220
 #define     ld_mutex        0
 
 pthread_mutex_t mutex; /* declaração da variável mutex */
@@ -26,7 +24,7 @@ pthread_mutex_t mutex; /* declaração da variável mutex */
 int     qtdMacrobloco = (M_LINHA * M_COLUNA) / (MB_LINHA * MB_COLUNA);
 int     counter;
 int     macroAtual = 0;
-int** matriz;
+int**   matriz;
 int     qtprimo;
 double  tempo;
 
@@ -41,18 +39,6 @@ typedef struct
 }
 IndexMacrobloco;
 
-/*
-typedef struct
-{
-    int     fromidx;
-    int     length;
-}
-thread_arg, *ptr_thread_arg;
-*/
-//pthread_t *tid;
-//pthread_t threads[NUM_THREADS];
-//thread_arg arguments[NUM_THREADS];
-
 IndexMacrobloco* vetIndexMacro;
 
 int     ehPrimo(int n);
@@ -62,33 +48,39 @@ void    gerarMatriz();
 void    gerarMacrobloco();
 void    printIndexMacroElemento();
 void    printMacroblocos();
-void* bus_primo(void* param);
+void*   bus_primo(void* param);
 void    liberarMemoria();
 
 int main(int argc, char** argv, char** envp)
 {
-    qtprimo = 0;
     clock_t inicio;
     clock_t fim;
-    printf("\nqtd macrobloco: %d\n", qtdMacrobloco);
+    printf("Quantidade macrobloco: \t\t\t %d\n", qtdMacrobloco);
+    printf("Numero de threads:\t\t\t %d\n", NUM_THREADS);
     gerarMatriz();
     gerarMacrobloco();
-
+    printf("-----------------------------------------------------------\n");
+    
+    qtprimo = 0;
     inicio = clock();
     serial();
     fim = clock();
     tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
     printf("Tempo de execucao serial:\t\t %f segundos\n", tempo);
+    
     qtprimo = 0;
     inicio = clock();
     ext_threads();
     fim = clock();
     tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-
     printf("Tempo de execucao multithread:\t\t %f segundos\n", tempo);
-    printf("qnt numeros:\t\t %d\n", (M_LINHA * M_COLUNA));
-    printf("qnt primos:\t\t %d\n", qtprimo);
-    printf("qnt nao primos:\t\t %d\n", ((M_LINHA * M_COLUNA) - qtprimo));
+
+    printf("-----------------------------------------------------------\n");
+    printf("Quantidade elementos da matriz:\t\t %d\n", (M_LINHA * M_COLUNA));
+    printf("Quantidade primos:\t\t\t %d\n", qtprimo);
+    printf("Quantidade nao primos:\t\t\t %d\n", ((M_LINHA * M_COLUNA) - qtprimo));
+
+
 
     liberarMemoria();
     return 0;
@@ -115,17 +107,6 @@ void gerarMatriz()
             matriz[l][c] = rand() % 31999;
         }
     }
-    //  Loop para imprimir a matriz
-    /*
-    for (int l = 0; l < M_LINHA; l++)
-    {
-        for (int c = 0; c < M_COLUNA; c++)
-        {
-            printf("\t%d ", matriz[l][c]);
-        }
-        //printf("\n");
-    }
-    */
 }
 
 void gerarMacrobloco()
@@ -216,7 +197,7 @@ int ext_threads()
         //printf("\n no ext_threads: criando thread %d.\n", i);
         thread_args[i] = i;
         result_code = pthread_create(&threads[i], NULL, bus_primo, &thread_args[i]);
-         //assert(!result_code);
+        //assert(!result_code);
     }
 
     // printf("\n no ext_threads: todas as threads foram criadas.\n");
@@ -249,7 +230,7 @@ void* bus_primo(void* arguments)
     // printf("\n### a thread %d Iniciou.\n", index);
     // printf("\nfuncao %d",index);
 
-    for ( int id_t_mb = index; (id_t_mb + NUM_THREADS) < (qtdMacrobloco + (NUM_THREADS - 1)); id_t_mb += NUM_THREADS)
+    for (int id_t_mb = index; (id_t_mb + NUM_THREADS) < (qtdMacrobloco + (NUM_THREADS - 1)); id_t_mb += NUM_THREADS)
     {
         linhaInit = vetIndexMacro[id_t_mb].linhaInicial;
         colunaInit = vetIndexMacro[id_t_mb].colunaInicial;
