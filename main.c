@@ -258,21 +258,21 @@ void* bus_primo(void* arguments)
             {
                 if (ehPrimo(matriz[linha][coluna]) == 1)
                 {
-                    /*
+                    
                     if (ld_mutex == 1)
                     {
                         pthread_mutex_lock(&mutex);
                     }
-                    */
+                    
 
 
                     qtprimo++; 
-                    /*
+                    
                     if (ld_mutex == 1)
                     {
                         pthread_mutex_unlock(&mutex);
                     }
-                    */
+                    
                 }
                 // printf("\n$$$ a thread %d: vai descansar por %d segundos.\n",
                 // index, sleep_time);
