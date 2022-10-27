@@ -13,11 +13,11 @@
 #include    <time.h>
 
 #define     NUM_THREADS     4
-#define     M_LINHA         200
-#define     M_COLUNA        200
-#define     MB_LINHA        20
-#define     MB_COLUNA       20
-#define     ld_mutex        1
+#define     M_LINHA         10000
+#define     M_COLUNA        10000
+#define     MB_LINHA        100
+#define     MB_COLUNA       100
+#define     ld_mutex        1           /* manual */
 
 /* declaração da variável mutex */
 pthread_mutex_t mutex; 
@@ -258,15 +258,10 @@ void* bus_primo(void* arguments)
             for (int coluna = colunaInit; coluna <= colunaFim; coluna++)
             {
                 if (ehPrimo(matriz[linha][coluna]) == 1)
-                {if (ld_mutex == 1)
-                    {
-                        pthread_mutex_lock(&mutex);
-                    }
-
-                    qtprimo++;        if (ld_mutex == 1)
-                    {
-                        pthread_mutex_unlock(&mutex);
-                    }
+                {
+                    pthread_mutex_lock(&mutex);
+                    qtprimo++;
+                    pthread_mutex_unlock(&mutex);
 
                 }
                 // printf("\n$$$ a thread %d: vai descansar por %d segundos.\n",
