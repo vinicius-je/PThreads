@@ -307,79 +307,11 @@ void* bus_primo(void* arguments)
 
 int ehPrimo(int n)
 {
-    /*
-    if (n == 0)
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 0;
-    }*/
     if (n == 1)
     {
         // printf("\nN\t %d \tnon est\t\tprimo", n);
         return 0;
     }
-    /*
-    if (n == 2)
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 1;
-    }
-    if (n == 3)
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 1;
-    }
-    if (n == 5)
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 1;
-    }
-    if (n == 7)
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 1;
-    }
-    if (n == 11)
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 1;
-    }
-    if (n == 13)
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 1;
-    }
-    if ((n / 2) == round((n / 2)))
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 0;
-    }
-    if ((n / 3) == round((n / 3)))
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 0;
-    }
-    if ((n / 5) == round((n / 5)))
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 0;
-    }
-    if ((n / 7) == round((n / 7)))
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 0;
-    }
-    if ((n / 11) == round((n / 11)))
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 0;
-    }
-    if ((n / 10) == round((n / 10)))
-    {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
-        return 0;
-    }
-    */
     int raiz = sqrt(n);
     //Se o resto da divis�o for zero, o i � um divisor
     for (int i = 2; i <= raiz; i++)
