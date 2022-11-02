@@ -1,3 +1,17 @@
+/********************************************************
+#
+#  Desenvolvido por: 
+#   Marcos Mendes
+#   Petar Veljovic
+#   Vinícius Estevam
+#
+#  Introdução à Programação Multithread com PThreads - T1
+#   Disciplina: Sistemas Operacionais
+#   Período: 2022/2
+#   Professor: Flávio Giraldeli
+#
+********************************************************/
+
 #pragma     comment(lib,"pthreadVC2.lib")
 #define     HAVE_STRUCT_TIMESPEC
 #pragma     once
@@ -15,8 +29,8 @@
 #define     NUM_THREADS                         4
 #define     M_LINHA                             10000
 #define     M_COLUNA                            10000
-#define     MB_LINHA                            2
-#define     MB_COLUNA                           2
+#define     MB_LINHA                            100
+#define     MB_COLUNA                           100
 #define     ld_mutex                            1 //manual
 
 /* declaração da variável mutex */
@@ -25,7 +39,7 @@ pthread_mutex_t mutex;
 int         qtdMacrobloco = (M_LINHA * M_COLUNA) / (MB_LINHA * MB_COLUNA);
 int         counter;
 int         macroAtual = 0;
-int**       matriz;
+int** matriz;
 int         qtprimo;
 double      tempo;
 
@@ -43,13 +57,13 @@ IndexMacrobloco* vetIndexMacro;
 
 int         ext_threads();
 int         ehPrimo(int n);
-void*       bus_primo(void* param);
+void* bus_primo(void* param);
 void        serial();
 void        gerarMatriz();
 void        gerarMacrobloco();
 void        liberarMemoria();
 
-int main(int argc, char** argv, char** envp)
+int main(int argc, char** argv, char** envp, char** apple)
 {
     clock_t inicio;
     clock_t fim;
@@ -207,7 +221,7 @@ int ext_threads()
         thread_args[i] = i;
         result_code = pthread_create(&threads[i], NULL, bus_primo, &thread_args[i]);
     }
-    
+
     for (i = 0; i < NUM_THREADS; i++)
     {
         result_code = pthread_join(threads[i], NULL);
@@ -227,10 +241,10 @@ void* bus_primo(void* arguments)
 
     for (int id_t_mb = index; (id_t_mb + NUM_THREADS) <= (qtdMacrobloco + (NUM_THREADS - 1)); id_t_mb += NUM_THREADS)
     {
-        linhaInit   = vetIndexMacro[id_t_mb].linhaInicial;
-        colunaInit  = vetIndexMacro[id_t_mb].colunaInicial;
-        linhaFim    = vetIndexMacro[id_t_mb].linhaFim;
-        colunaFim   = vetIndexMacro[id_t_mb].colunaFim;
+        linhaInit = vetIndexMacro[id_t_mb].linhaInicial;
+        colunaInit = vetIndexMacro[id_t_mb].colunaInicial;
+        linhaFim = vetIndexMacro[id_t_mb].linhaFim;
+        colunaFim = vetIndexMacro[id_t_mb].colunaFim;
 
         for (int linha = linhaInit; linha <= linhaFim; linha++)
         {
