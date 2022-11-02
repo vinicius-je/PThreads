@@ -11,13 +11,12 @@
 #include    <stdio.h>
 #include    <stdlib.h>
 #include    <time.h>
-// #include    <assert.h> // unix
 
 #define     NUM_THREADS                         4
-#define     M_LINHA                             1000
-#define     M_COLUNA                            1000
-#define     MB_LINHA                            10
-#define     MB_COLUNA                           10
+#define     M_LINHA                             10000
+#define     M_COLUNA                            10000
+#define     MB_LINHA                            2
+#define     MB_COLUNA                           2
 #define     ld_mutex                            1 //manual
 
 /* declaração da variável mutex */
@@ -42,25 +41,16 @@ IndexMacrobloco;
 
 IndexMacrobloco* vetIndexMacro;
 
-int         serialethread();
 int         ext_threads();
 int         ehPrimo(int n);
-
 void*       bus_primo(void* param);
 void        serial();
 void        gerarMatriz();
 void        gerarMacrobloco();
-//void      printIndexMacroElemento();
 void        printMacroblocos();
 void        liberarMemoria();
 
 int main(int argc, char** argv, char** envp)
-{
-    serialethread();
-    return 0;
-}
-
-int serialethread()
 {
     clock_t inicio;
     clock_t fim;
@@ -187,32 +177,6 @@ void gerarMacrobloco()
     }
 }
 
-void printMacroblocos()
-{
-    int linhaInit;
-    int colunaInit;
-    int linhaFim;
-    int colunaFim;
-
-    for (int i = 0; i < qtdMacrobloco; i++)
-    {
-        linhaInit = vetIndexMacro[i].linhaInicial;
-        colunaInit = vetIndexMacro[i].colunaInicial;
-        linhaFim = vetIndexMacro[i].linhaFim;
-        colunaFim = vetIndexMacro[i].colunaFim;
-
-        printf("X MACROBLOCO %d\n\n", i + 1);
-        for (int linha = linhaInit; linha <= linhaFim; linha++)
-        {
-            for (int coluna = colunaInit; coluna <= colunaFim; coluna++)
-            {
-                printf("%d ", matriz[linha][coluna]);
-            }
-            printf("\n\n");
-        }
-    }
-}
-
 void serial()
 {
     for (int i = 0; i < M_LINHA; i++)
@@ -236,47 +200,31 @@ int ext_threads()
 
     if (pthread_mutex_init(&mutex, NULL) != 0)
     {
-        //printf("\n mutex init nao funcionou\n");
         return 1;
     }
 
     for (i = 0; i < NUM_THREADS; i++)
     {
-        //printf("\n no ext_threads: criando thread %d.\n", i);
         thread_args[i] = i;
         result_code = pthread_create(&threads[i], NULL, bus_primo, &thread_args[i]);
-        //assert(!result_code);
     }
-
-    // printf("\n no ext_threads: todas as threads foram criadas.\n");
-
-    // aguardar cada thread terminar
+    
     for (i = 0; i < NUM_THREADS; i++)
     {
         result_code = pthread_join(threads[i], NULL);
-
-        //assert(!result_code);
-        // printf("\n no ext_threads: a thread %d terminou.\n", i);
     }
     pthread_mutex_destroy(&mutex);
-    // printf("\n ext_threads terminou.\n");
     return 0;
 }
 
 void* bus_primo(void* arguments)
 {
-    //int i;
     int     linhaInit;
     int     colunaInit;
     int     linhaFim;
     int     colunaFim;
     int     id_t_mb;
     int     index = *((int*)arguments);
-
-    //int    sleep_time  =  1 + rand() % NUM_THREADS;
-
-    // printf("\n### a thread %d Iniciou.\n", index);
-    // printf("\nfuncao %d",index);
 
     for (int id_t_mb = index; (id_t_mb + NUM_THREADS) <= (qtdMacrobloco + (NUM_THREADS - 1)); id_t_mb += NUM_THREADS)
     {
@@ -295,13 +243,9 @@ void* bus_primo(void* arguments)
                     qtprimo++;
                     pthread_mutex_unlock(&mutex); //manual
                 }
-                // printf("\n$$$ a thread %d: vai descansar por %d segundos.\n", index, sleep_time);
             }
         }
-
-        // printf("\n!!! a thread %d Terminou.\n", index);
     }
-    //return(NULL);
     pthread_exit(NULL);
 }
 
@@ -309,20 +253,16 @@ int ehPrimo(int n)
 {
     if (n == 1)
     {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
         return 0;
     }
     int raiz = sqrt(n);
-    //Se o resto da divis�o for zero, o i � um divisor
     for (int i = 2; i <= raiz; i++)
     {
         if (n % i == 0)
         {
-            // printf("\nN\t %d \tnon est\t\tprimo", n);
             return 0;
         }
     }
-    // printf("\nP\t %d \test\t\t\tprimo", n);
     return 1;
 }
 
