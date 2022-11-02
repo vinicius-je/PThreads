@@ -14,8 +14,8 @@
 // #include    <assert.h> // unix
 
 #define     NUM_THREADS                         4
-#define     M_LINHA                             1000
-#define     M_COLUNA                            1000
+#define     M_LINHA                             10000
+#define     M_COLUNA                            10000
 #define     MB_LINHA                            2
 #define     MB_COLUNA                           2
 #define     ld_mutex                            1 //manual
@@ -52,8 +52,6 @@ void* bus_primo(void* param);
 void        serial();
 void        gerarMatriz();
 void        gerarMacrobloco();
-//void      printIndexMacroElemento();
-void        printMacroblocos();
 void        liberarMemoria();
 
 int main(int argc, char** argv, char** envp)
@@ -82,7 +80,6 @@ int serialethread()
     printf("\tMutex? (1-sim, 0-nao):                   %d\n", ld_mutex);
     gerarMatriz();
     gerarMacrobloco();
-    //printMacroblocos();
     printf("---------------------------------------------------------------\n");
 
     qtprimo = 0;
@@ -127,15 +124,12 @@ void gerarMatriz()
             matriz[i] = calloc(M_COLUNA, sizeof(int));
         }
         //  Loop para adicionar os valores aleatórios na matriz
-        //printf("\n");
         for (int l = 0; l < M_LINHA; l++)
         {
             for (int c = 0; c < M_COLUNA; c++)
             {
                 matriz[l][c] = rand() % 31999;
-                //printf("\t%d ", matriz[l][c]);
             }
-            //printf("\n");
         }
     }
     if (M_LINHA != M_COLUNA)
@@ -194,32 +188,6 @@ void gerarMacrobloco()
     }
 }
 
-void printMacroblocos()
-{
-    int linhaInit;
-    int colunaInit;
-    int linhaFim;
-    int colunaFim;
-
-    for (int i = 0; i < qtdMacrobloco; i++)
-    {
-        linhaInit = vetIndexMacro[i].linhaInicial;
-        colunaInit = vetIndexMacro[i].colunaInicial;
-        linhaFim = vetIndexMacro[i].linhaFim;
-        colunaFim = vetIndexMacro[i].colunaFim;
-
-        printf("X MACROBLOCO %d\n\n", i + 1);
-        for (int linha = linhaInit; linha <= linhaFim; linha++)
-        {
-            for (int coluna = colunaInit; coluna <= colunaFim; coluna++)
-            {
-                printf("%d ", matriz[linha][coluna]);
-            }
-            printf("\n\n");
-        }
-    }
-}
-
 void serial()
 {
     for (int i = 0; i < M_LINHA; i++)
@@ -243,43 +211,32 @@ int ext_threads()
 
     if (pthread_mutex_init(&mutex, NULL) != 0)
     {
-        //printf("\n mutex init nao funcionou\n");
         return 1;
     }
 
     if (pthread_mutex_init(&mb_mutex, NULL) != 0)
     {
-        //printf("\n mutex init nao funcionou\n");
         return 1;
     }
 
     for (i = 0; i < NUM_THREADS; i++)
     {
-        //printf("\n no ext_threads: criando thread %d.\n", i);
         thread_args[i] = i;
         result_code = pthread_create(&threads[i], NULL, bus_primo, &thread_args[i]);
-        //assert(!result_code);
     }
-
-    // printf("\n no ext_threads: todas as threads foram criadas.\n");
 
     // aguardar cada thread terminar
     for (i = 0; i < NUM_THREADS; i++)
     {
         result_code = pthread_join(threads[i], NULL);
-
-        //assert(!result_code);
-        // printf("\n no ext_threads: a thread %d terminou.\n", i);
     }
     pthread_mutex_destroy(&mutex);
     pthread_mutex_destroy(&mb_mutex);
-    // printf("\n ext_threads terminou.\n");
     return 0;
 }
 
 void* bus_primo(void* arguments)
 {
-    //int i;
     int     linhaInit;
     int     colunaInit;
     int     linhaFim;
@@ -287,29 +244,11 @@ void* bus_primo(void* arguments)
     int     id_t_mb;
     int     index = *((int*)arguments);
 
-    //int    sleep_time  =  1 + rand() % NUM_THREADS;
-
-    // printf("\n### a thread %d Iniciou.\n", index);
-    // printf("\nfuncao %d",index);
-    //for (int id_t_mb = index; (id_t_mb + NUM_THREADS) <= (qtdMacrobloco + (NUM_THREADS - 1)); id_t_mb += NUM_THREADS)
-
-  //int         feito[(M_LINHA * M_COLUNA) / (MB_LINHA * MB_COLUNA)];
-
-    //printf("\n%d",&mb_mutex);
-    //printf("\n%d",feito[id_t_mb]);
-    for (int id_t_mb = index; (id_t_mb+1) <= (qtdMacrobloco); id_t_mb= id_t_mb+1)
+    for (int id_t_mb = index; (id_t_mb + 1) <= (qtdMacrobloco); id_t_mb = id_t_mb + 1)
     {
-        //printf("\n%d", feito[id_t_mb]);
         if (feito[id_t_mb] == 0)
         {
-            //printf("\n%d", &mb_mutex);
-            //pthread_mutex_lock(&mb_mutex);
-            //printf("\n%d", &mb_mutex);
-                //printf("\n%d",mb_mutex);
             feito[id_t_mb] = 1;
-            //pthread_mutex_unlock(&mb_mutex);
-            //printf("\n%d",&mb_mutex);
-
 
             linhaInit = vetIndexMacro[id_t_mb].linhaInicial;
             colunaInit = vetIndexMacro[id_t_mb].colunaInicial;
@@ -322,29 +261,16 @@ void* bus_primo(void* arguments)
                 {
                     if (ehPrimo(matriz[linha][coluna]) == 1)
                     {
-                        //pthread_mutex_lock(&mb_mutex);
+
                         pthread_mutex_lock(&mutex); //manual
-                        //printf("\n%d",&mutex);
-                        //if (mutex == 1)
-                        //{
-                            qtprimo++;
-                        //}
+                        qtprimo++;
+
                         pthread_mutex_unlock(&mutex); //manual
-                        //pthread_mutex_unlock(&mb_mutex);
                     }
-                    // printf("\n$$$ a thread %d: vai descansar por %d segundos.\n", index, sleep_time);
                 }
             }
-
-
-
-
         }
-
-
-        // printf("\n!!! a thread %d Terminou.\n", index);
     }
-    //return(NULL);
     pthread_exit(NULL);
 }
 
@@ -352,21 +278,17 @@ int ehPrimo(int n)
 {
     if (n == 1)
     {
-        // printf("\nN\t %d \tnon est\t\tprimo", n);
         return 0;
     }
-    
+
     int raiz = sqrt(n);
-    //Se o resto da divis�o for zero, o i � um divisor
     for (int i = 2; i <= raiz; i++)
     {
         if (n % i == 0)
         {
-            //printf("\nN\t %d \tnon est\t\tprimo", n);
             return 0;
         }
     }
-    //printf("\nP\t %d \test\t\t\tprimo", n);
     return 1;
 }
 
