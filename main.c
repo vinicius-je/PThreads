@@ -47,7 +47,6 @@ void*       bus_primo(void* param);
 void        serial();
 void        gerarMatriz();
 void        gerarMacrobloco();
-void        printMacroblocos();
 void        liberarMemoria();
 
 int main(int argc, char** argv, char** envp)
